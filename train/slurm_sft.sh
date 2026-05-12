@@ -34,10 +34,17 @@ mkdir -p "$HF_HOME"
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export TOKENIZERS_PARALLELISM=false
 
-# Path to the Nemotron base model. Download once with:
-#   huggingface-cli download <repo_id> --local-dir $HOME/models/nemotron-3-nano-30b
-# or kagglehub.model_download(...) on a Kaggle box, then rsync it over.
+# Base model. If MODEL_PATH isn't set or doesn't point to weights, we fetch
+# from Kaggle Hub via train/download_model.py. Requires ~/.kaggle/kaggle.json
+# (chmod 600) — create one at https://www.kaggle.com/settings.
 MODEL_PATH=${MODEL_PATH:-$HOME/models/nemotron-3-nano-30b-a3b-bf16}
+if [ ! -f "$MODEL_PATH/config.json" ]; then
+    echo "=> base model not found at $MODEL_PATH; fetching from Kaggle Hub"
+    python -u -m train.download_model --dest "$HOME/models"
+    MODEL_PATH=$(cat "$HOME/models/MODEL_PATH")
+    echo "=> using MODEL_PATH=$MODEL_PATH"
+fi
+
 DATA=${DATA:-$HOME/nemotron/synth/data.jsonl}
 OUT_DIR=${OUT_DIR:-$HOME/nemotron/runs/sft1}
 

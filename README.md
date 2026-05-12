@@ -44,31 +44,38 @@ STRATEGY.md                # full plan
 ## Pipeline
 
 ```bash
-# 1. Get the data (place train.csv / test.csv into ./data/)
-unzip nvidia-nemotron-model-reasoning-challenge.zip -d data/
+# 1. Data is checked into the repo (data/train.csv, data/test.csv).
+#    synth/data.jsonl is also tracked, so step 3 is optional on a fresh clone.
 
 # 2. Verify solver coverage on train
 python -m eval.score
 
-# 3. Generate the SFT dataset
+# 3. (Optional) Regenerate the SFT dataset
 python -m synth.generate --out synth/data.jsonl
 
-# 4. Fine-tune (single L40s 48 GB, QLoRA)
+# 4. Pre-download the base model from Kaggle Hub.
+#    Requires ~/.kaggle/kaggle.json (chmod 600). Create one at
+#    https://www.kaggle.com/settings → "Create New Token".
+#    slurm_sft.sh will call this automatically on first run if the model
+#    isn't already cached locally.
+python -m train.download_model            # ≈60 GB, one-time
+
+# 5. Fine-tune (single L40s 48 GB, QLoRA)
 sbatch train/slurm_sft.sh
 # or locally:
 python -m train.sft \
-    --model-path /path/to/nemotron-3-nano-30b-a3b-bf16 \
+    --model-path $HOME/models/nemotron-3-nano-30b-a3b-bf16 \
     --data synth/data.jsonl --out-dir runs/sft1 \
     --quant nf4 --epochs 1 --batch-size 1 --grad-accum 32 --lr 2e-4
 
-# 5. Package
+# 6. Package the adapter for Kaggle submission
 python -m train.package_submission --adapter-dir runs/sft1/final \
     --out submission.zip
 ```
 
 ## Requirements
 
-`pip install torch transformers peft bitsandbytes datasets accelerate tensorboard mamba_ssm causal_conv1d pandas numpy`
+`pip install torch transformers peft bitsandbytes datasets accelerate tensorboard mamba_ssm causal_conv1d pandas numpy kagglehub`
 
 ## License
 
