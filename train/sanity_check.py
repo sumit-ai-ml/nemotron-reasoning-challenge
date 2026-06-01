@@ -57,6 +57,8 @@ def main():
         bnb_4bit_quant_type="nf4",
         bnb_4bit_compute_dtype=torch.bfloat16,
         bnb_4bit_use_double_quant=True,
+        # Match sft.py: fused Mamba kernel needs bf16 out_proj.
+        llm_int8_skip_modules=["out_proj"],
     )
     model = AutoModelForCausalLM.from_pretrained(
         args.model_path,

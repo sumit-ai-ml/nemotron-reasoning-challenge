@@ -97,6 +97,10 @@ def main():
             bnb_4bit_quant_type="nf4",
             bnb_4bit_compute_dtype=torch.bfloat16,
             bnb_4bit_use_double_quant=True,
+            # The fused Mamba kernel reaches into out_proj.weight directly and
+            # bypasses Linear4bit.__call__, so out_proj must stay bf16 or the
+            # training forward dies with a shape mismatch on the packed buffer.
+            llm_int8_skip_modules=["out_proj"],
         )
 
     print(f"=> loading model from {args.model_path}  (quant={args.quant})", flush=True)
