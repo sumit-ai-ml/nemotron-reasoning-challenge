@@ -107,6 +107,9 @@ fi
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 export TOKENIZERS_PARALLELISM=false
 
+echo "=== fixing safetensors metadata (one-time, idempotent) ==="
+python -u -m train.fix_safetensors_metadata --model-dir "$MODEL_PATH"
+
 echo "=== starting sanity check ==="
 python -u -m train.sanity_check --model-path "$MODEL_PATH"
 echo "=== done $(date) ==="
