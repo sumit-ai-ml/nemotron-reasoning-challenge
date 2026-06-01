@@ -62,7 +62,9 @@ echo "=================="
 echo "=== fixing safetensors metadata (one-time, idempotent) ==="
 python -u -m train.fix_safetensors_metadata --model-dir "$MODEL_PATH"
 
-srun python -u -m train.sft \
+# No srun: --ntasks=1 means a single rank, and the nested srun was swallowing
+# the Python traceback when sft.py exited mid-load. Match slurm_sanity.sh.
+python -u -m train.sft \
     --model-path "$MODEL_PATH" \
     --data "$DATA" \
     --out-dir "$OUT_DIR" \

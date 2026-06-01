@@ -99,7 +99,7 @@ def main():
             bnb_4bit_use_double_quant=True,
         )
 
-    print(f"=> loading model from {args.model_path}  (quant={args.quant})")
+    print(f"=> loading model from {args.model_path}  (quant={args.quant})", flush=True)
     model = AutoModelForCausalLM.from_pretrained(
         args.model_path,
         device_map="auto",
@@ -107,11 +107,15 @@ def main():
         torch_dtype=torch.bfloat16,
         quantization_config=quant_config,
     )
+    print(f"   model loaded: {type(model).__name__} "
+          f"params={sum(p.numel() for p in model.parameters()):,}", flush=True)
     model.config.use_cache = False
     if args.quant == "nf4":
+        print("=> prepare_model_for_kbit_training", flush=True)
         model = prepare_model_for_kbit_training(model)
+        print("   kbit prep done", flush=True)
 
-    print(f"=> applying LoRA rank={args.lora_rank} alpha={args.lora_alpha}")
+    print(f"=> applying LoRA rank={args.lora_rank} alpha={args.lora_alpha}", flush=True)
     lora_config = LoraConfig(
         r=args.lora_rank,
         lora_alpha=args.lora_alpha,
