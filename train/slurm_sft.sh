@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=nemotron_sft
 #SBATCH --chdir=/home/pds981/nemotron-reasoning-challenge
-#SBATCH --output=/home/pds981/nemotron-reasoning-challenge/logs/sft_%j.out
-#SBATCH --error=/home/pds981/nemotron-reasoning-challenge/logs/sft_%j.err
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
 #SBATCH --time=48:00:00
 #SBATCH --partition=ml4good
 #SBATCH --gres=gpu:l40s:1
@@ -15,7 +15,7 @@
 # Run train/slurm_sanity.sh once first to provision the venv.
 
 set -euo pipefail
-mkdir -p logs runs
+mkdir -p runs
 
 hostname
 nvidia-smi

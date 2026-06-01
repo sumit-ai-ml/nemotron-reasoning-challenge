@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --job-name=nemotron_sanity
 #SBATCH --chdir=/home/pds981/nemotron-reasoning-challenge
-#SBATCH --output=/home/pds981/nemotron-reasoning-challenge/logs/sanity_%j.out
-#SBATCH --error=/home/pds981/nemotron-reasoning-challenge/logs/sanity_%j.err
+#SBATCH --output=%x_%j.out
+#SBATCH --error=%x_%j.err
 #SBATCH --time=01:00:00
 #SBATCH --partition=ml4good
 #SBATCH --gres=gpu:l40s:1
@@ -28,7 +28,6 @@
 #                 --cpus-per-task=8 --mem=64GB --pty bash train/slurm_sanity.sh
 
 set -euo pipefail
-mkdir -p logs
 
 hostname
 nvidia-smi -L
