@@ -104,7 +104,7 @@ def main():
         args.model_path,
         device_map="auto",
         trust_remote_code=True,
-        dtype=torch.bfloat16,
+        torch_dtype=torch.bfloat16,
         quantization_config=quant_config,
     )
     model.config.use_cache = False
