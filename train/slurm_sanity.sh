@@ -110,6 +110,9 @@ export TOKENIZERS_PARALLELISM=false
 echo "=== fixing safetensors metadata (one-time, idempotent) ==="
 python -u -m train.fix_safetensors_metadata --model-dir "$MODEL_PATH"
 
+echo "=== patching MoE dtype bug in modeling code (idempotent) ==="
+python -u -m train.fix_modeling_moe --model-dir "$MODEL_PATH"
+
 echo "=== starting sanity check ==="
 python -u -m train.sanity_check --model-path "$MODEL_PATH"
 echo "=== done $(date) ==="
